@@ -2,6 +2,7 @@ import bcrypt from "bcrypt";
 import {
   createUser,
   findUserByEmail,
+  findUserById,
 } from "../repositories/user.repository";
 import { generateToken } from "../utils/jwt";
 
@@ -64,5 +65,19 @@ export const loginUser = async (
       email: user.email,
     },
     token,
+  };
+};
+
+export const getCurrentUser = async (userId: string) => {
+  const user = await findUserById(userId);
+
+  if (!user) {
+    throw new Error("User not found");
+  }
+
+  return {
+    id: user.id,
+    name: user.name,
+    email: user.email,
   };
 };

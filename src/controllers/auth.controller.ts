@@ -2,7 +2,9 @@ import { Request, Response } from "express";
 import {
   registerUser,
   loginUser,
+  getCurrentUser,
 } from "../services/auth.service";
+import { AuthRequest } from "../middleware/authMiddleware";
 
 export const register = async (
   req: Request,
@@ -64,6 +66,46 @@ export const login = async (
       error.message === "Invalid email or password"
     ) {
       res.status(401).json({
+        success: false,
+        message: error.message,
+      });
+      return;
+    }
+
+    res.status(500).json({
+      success: false,
+      message: "Something went wrong",
+    });
+  }
+};
+
+export const getMe = async (
+  req: AuthRequest,
+  res: Response
+) => {
+  try {
+    const userId = req.userId;
+
+    if (!userId) {
+      res.status(401).json({
+        success: false,
+        message: "Unauthorized",
+      });
+      return;
+    }
+
+    const user = await getCurrentUser(userId);
+
+    res.status(200).json({
+      success: true,
+      user,
+    });
+  } catch (error) {
+    if (
+      error instanceof Error &&
+      error.message === "User not found"
+    ) {
+      res.status(404).json({
         success: false,
         message: error.message,
       });
