@@ -12,7 +12,9 @@ interface JwtPayload {
 }
 
 export interface AuthRequest extends Request {
-  userId?: string;
+  user?: {
+    userId: string;
+  };
 }
 
 export const authMiddleware = (
@@ -34,7 +36,9 @@ export const authMiddleware = (
 
     const decoded = jwt.verify(token, JWT_SECRET) as JwtPayload;
 
-    req.userId = decoded.userId;
+    req.user = {
+      userId: decoded.userId,
+    };
 
     next();
   } catch (error) {
